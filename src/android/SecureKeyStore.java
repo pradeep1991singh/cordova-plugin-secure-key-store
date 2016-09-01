@@ -1,8 +1,6 @@
-package cordova
+package com.securekeystore.plugins;
 
 import java.lang.String;
-
--plugin-secure-key-store;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
