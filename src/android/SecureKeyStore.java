@@ -71,7 +71,7 @@ public class SecureKeyStore extends CordovaPlugin {
         }
 
         if (action.equals("createKeys")) {
-            createKeys();
+            createKeys(getActivity());
             return true;
         }
 
@@ -134,7 +134,7 @@ public class SecureKeyStore extends CordovaPlugin {
      * Creates a public and private key and stores it using the Android Key Store, so that only
      * this application will be able to access the keys.
      */
-    public void createKeys(/*Context context*/) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    public void createKeys(Context context) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         // Create a start and end time, for the validity range of the key pair that's about to be
         // generated.
         Calendar start = new GregorianCalendar();
@@ -146,7 +146,7 @@ public class SecureKeyStore extends CordovaPlugin {
         // to the KeyPairGenerator.  For a fun home game, count how many classes in this sample
         // start with the phrase "KeyPair".
         KeyPairGeneratorSpec spec =
-                new KeyPairGeneratorSpec.Builder(this)
+                new KeyPairGeneratorSpec.Builder(context)
                         // You'll use the alias later to retrieve the key.  It's a key for the key!
                         .setAlias(mAlias)
                                 // The subject used for the self-signed certificate of the generated pair
