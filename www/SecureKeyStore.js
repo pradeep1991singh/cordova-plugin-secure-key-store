@@ -1,5 +1,9 @@
 var exec = require('cordova/exec');
 
-exports.coolMethod = function(arg0, success, error) {
-    exec(success, error, "SecureKeyStore", "coolMethod", [arg0]);
+exports.getKey = function(arg0, success, error) {
+    exec(success, error, "SecureKeyStore", "getKey", [arg0]);
+};
+
+exports.setKey = function(success, error) {
+    exec(success, error, "SecureKeyStore", "setKey");
 };
