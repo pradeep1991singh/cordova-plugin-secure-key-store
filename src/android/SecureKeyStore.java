@@ -1,5 +1,4 @@
 package com.securekeystore.plugins;
-import com.securekeystore.log;
 
 import java.lang.String;
 
@@ -19,6 +18,7 @@ import android.os.Bundle;
 import android.security.KeyPairGeneratorSpec;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
+import android.util.Log;
 
 import java.io.IOException;
 import java.math.BigInteger;
