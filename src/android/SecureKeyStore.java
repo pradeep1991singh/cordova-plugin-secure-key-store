@@ -70,26 +70,26 @@ public class SecureKeyStore extends CordovaPlugin {
         }
 
         if (action.equals("createKeys")) {
-            createKeys();
+            createKeys(callbackContext);
             return true;
         }
 
-        if (action.equals("signData")) {
-            mSignatureStr = signData(SAMPLE_INPUT);
-//            SecretKey key = args.getString(0);
-//            this.setKey(key, callbackContext);
-            return true;
-        }
-
-        if (action.equals("verifyData")) {
-            boolean verified = false;
-            if (mSignatureStr != null) {
-                verified = verifyData(SAMPLE_INPUT, mSignatureStr);
-            }
-//            String key = args.getString(0);
-//            this.getKey(callbackContext);
-            return true;
-        }
+//        if (action.equals("signData")) {
+//            mSignatureStr = signData(SAMPLE_INPUT, callbackContext);
+////            SecretKey key = args.getString(0);
+////            this.setKey(key, callbackContext);
+//            return true;
+//        }
+//
+//        if (action.equals("verifyData")) {
+//            boolean verified = false;
+//            if (mSignatureStr != null) {
+//                verified = verifyData(SAMPLE_INPUT, mSignatureStr, callbackContext);
+//            }
+////            String key = args.getString(0);
+////            this.getKey(callbackContext);
+//            return true;
+//        }
 
         return false;
     }
@@ -133,7 +133,7 @@ public class SecureKeyStore extends CordovaPlugin {
      * Creates a public and private key and stores it using the Android Key Store, so that only
      * this application will be able to access the keys.
      */
-    public void createKeys() {
+    public void createKeys(CallbackContext callbackContext) {
         // Create a start and end time, for the validity range of the key pair that's about to be
         // generated.
 //        Calendar start = new GregorianCalendar();
@@ -172,124 +172,129 @@ public class SecureKeyStore extends CordovaPlugin {
          * used for signing or verification and only with SHA-256 or
          * SHA-512 as the message digest.
          */
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance(
-                KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
-        kpg.initialize(new KeyGenParameterSpec.Builder(
-                mAlias,
-                KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
-                .setDigests(KeyProperties.DIGEST_SHA256,
-                        KeyProperties.DIGEST_SHA512)
-                .build());
-
-        KeyPair kp = kpg.generateKeyPair();
-
-        Log.d(TAG, "Public Key is: " + kp.getPublic().toString());
-    }
-
-    public String signData(String inputStr) {
-        byte[] data = inputStr.getBytes();
-
-        KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
-
-        // Weird artifact of Java API.  If you don't have an InputStream to load, you still need
-        // to call "load", or it'll crash.
-        ks.load(null);
-
-        // Load the key pair from the Android Key Store
-        KeyStore.Entry entry = ks.getEntry(mAlias, null);
-
-        /* If the entry is null, keys were never stored under this alias.
-         * Debug steps in this situation would be:
-         * -Check the list of aliases by iterating over Keystore.aliases(), be sure the alias
-         *   exists.
-         * -If that's empty, verify they were both stored and pulled from the same keystore
-         *   "AndroidKeyStore"
-         */
-        if (entry == null) {
-            Log.w(TAG, "No key found under alias: " + mAlias);
-            Log.w(TAG, "Exiting signData()...");
-            return null;
-        }
-
-        /* If entry is not a KeyStore.PrivateKeyEntry, it might have gotten stored in a previous
-         * iteration of your application that was using some other mechanism, or been overwritten
-         * by something else using the same keystore with the same alias.
-         * You can determine the type using entry.getClass() and debug from there.
-         */
-        if (!(entry instanceof KeyStore.PrivateKeyEntry)) {
-            Log.w(TAG, "Not an instance of a PrivateKeyEntry");
-            Log.w(TAG, "Exiting signData()...");
-            return null;
-        }
-
-        // This class doesn't actually represent the signature,
-        // just the engine for creating/verifying signatures, using
-        // the specified algorithm.
-        Signature s = Signature.getInstance("SHA256withRSA");
-
-        // Initialize Signature using specified private key
-        s.initSign(((KeyStore.PrivateKeyEntry) entry).getPrivateKey());
-
-        // Sign the data, store the result as a Base64 encoded String.
-        s.update(data);
-        byte[] signature = s.sign();
-        String result = Base64.encodeToString(signature, Base64.DEFAULT);
-
-        return result;
-    }
-
-    public boolean verifyData(String input, String signatureStr) {
-        byte[] data = input.getBytes();
-        byte[] signature;
-
-        // Make sure the signature string exists.  If not, bail out, nothing to do.
-
-        if (signatureStr == null) {
-            Log.w(TAG, "Invalid signature.");
-            Log.w(TAG, "Exiting verifyData()...");
-            return false;
-        }
-
         try {
-            // The signature is going to be examined as a byte array,
-            // not as a base64 encoded string.
-            signature = Base64.decode(signatureStr, Base64.DEFAULT);
-        } catch (IllegalArgumentException e) {
-            // signatureStr wasn't null, but might not have been encoded properly.
-            // It's not a valid Base64 string.
-            return false;
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
+            kpg.initialize(new KeyGenParameterSpec.Builder(mAlias, KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
+                    .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
+                    .build());
+
+            KeyPair kp = kpg.generateKeyPair();
+
+            Log.d(TAG, "Public Key is: " + kp.getPublic().toString());
+
+            callbackContext.success("Public Key is: " + kp.getPublic().toString());
+
+        } catch (Exception e) {
+
+            callbackContext.error("Exception: " + e);
+
         }
-
-        KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
-
-        // Weird artifact of Java API.  If you don't have an InputStream to load, you still need
-        // to call "load", or it'll crash.
-        ks.load(null);
-
-        // Load the key pair from the Android Key Store
-        KeyStore.Entry entry = ks.getEntry(mAlias, null);
-
-        if (entry == null) {
-            Log.w(TAG, "No key found under alias: " + mAlias);
-            Log.w(TAG, "Exiting verifyData()...");
-            return false;
-        }
-
-        if (!(entry instanceof KeyStore.PrivateKeyEntry)) {
-            Log.w(TAG, "Not an instance of a PrivateKeyEntry");
-            return false;
-        }
-
-        // This class doesn't actually represent the signature,
-        // just the engine for creating/verifying signatures, using
-        // the specified algorithm.
-        Signature s = Signature.getInstance("SHA256withRSA");
-
-        // Verify the data.
-        s.initVerify(((KeyStore.PrivateKeyEntry) entry).getCertificate());
-        s.update(data);
-        return s.verify(signature);
     }
+
+//    public String signData(String inputStr) {
+//        byte[] data = inputStr.getBytes();
+//
+//        KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
+//
+//        // Weird artifact of Java API.  If you don't have an InputStream to load, you still need
+//        // to call "load", or it'll crash.
+//        ks.load(null);
+//
+//        // Load the key pair from the Android Key Store
+//        KeyStore.Entry entry = ks.getEntry(mAlias, null);
+//
+//        /* If the entry is null, keys were never stored under this alias.
+//         * Debug steps in this situation would be:
+//         * -Check the list of aliases by iterating over Keystore.aliases(), be sure the alias
+//         *   exists.
+//         * -If that's empty, verify they were both stored and pulled from the same keystore
+//         *   "AndroidKeyStore"
+//         */
+//        if (entry == null) {
+//            Log.w(TAG, "No key found under alias: " + mAlias);
+//            Log.w(TAG, "Exiting signData()...");
+//            return null;
+//        }
+//
+//        /* If entry is not a KeyStore.PrivateKeyEntry, it might have gotten stored in a previous
+//         * iteration of your application that was using some other mechanism, or been overwritten
+//         * by something else using the same keystore with the same alias.
+//         * You can determine the type using entry.getClass() and debug from there.
+//         */
+//        if (!(entry instanceof KeyStore.PrivateKeyEntry)) {
+//            Log.w(TAG, "Not an instance of a PrivateKeyEntry");
+//            Log.w(TAG, "Exiting signData()...");
+//            return null;
+//        }
+//
+//        // This class doesn't actually represent the signature,
+//        // just the engine for creating/verifying signatures, using
+//        // the specified algorithm.
+//        Signature s = Signature.getInstance("SHA256withRSA");
+//
+//        // Initialize Signature using specified private key
+//        s.initSign(((KeyStore.PrivateKeyEntry) entry).getPrivateKey());
+//
+//        // Sign the data, store the result as a Base64 encoded String.
+//        s.update(data);
+//        byte[] signature = s.sign();
+//        String result = Base64.encodeToString(signature, Base64.DEFAULT);
+//
+//        return result;
+//    }
+//
+//    public boolean verifyData(String input, String signatureStr) {
+//        byte[] data = input.getBytes();
+//        byte[] signature;
+//
+//        // Make sure the signature string exists.  If not, bail out, nothing to do.
+//
+//        if (signatureStr == null) {
+//            Log.w(TAG, "Invalid signature.");
+//            Log.w(TAG, "Exiting verifyData()...");
+//            return false;
+//        }
+//
+//        try {
+//            // The signature is going to be examined as a byte array,
+//            // not as a base64 encoded string.
+//            signature = Base64.decode(signatureStr, Base64.DEFAULT);
+//        } catch (IllegalArgumentException e) {
+//            // signatureStr wasn't null, but might not have been encoded properly.
+//            // It's not a valid Base64 string.
+//            return false;
+//        }
+//
+//        KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
+//
+//        // Weird artifact of Java API.  If you don't have an InputStream to load, you still need
+//        // to call "load", or it'll crash.
+//        ks.load(null);
+//
+//        // Load the key pair from the Android Key Store
+//        KeyStore.Entry entry = ks.getEntry(mAlias, null);
+//
+//        if (entry == null) {
+//            Log.w(TAG, "No key found under alias: " + mAlias);
+//            Log.w(TAG, "Exiting verifyData()...");
+//            return false;
+//        }
+//
+//        if (!(entry instanceof KeyStore.PrivateKeyEntry)) {
+//            Log.w(TAG, "Not an instance of a PrivateKeyEntry");
+//            return false;
+//        }
+//
+//        // This class doesn't actually represent the signature,
+//        // just the engine for creating/verifying signatures, using
+//        // the specified algorithm.
+//        Signature s = Signature.getInstance("SHA256withRSA");
+//
+//        // Verify the data.
+//        s.initVerify(((KeyStore.PrivateKeyEntry) entry).getCertificate());
+//        s.update(data);
+//        return s.verify(signature);
+//    }
 
     public void setAlias(String alias) {
         mAlias = alias;
