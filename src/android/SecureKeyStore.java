@@ -17,7 +17,7 @@ import android.security.KeyPairGeneratorSpec;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
-import android.security.keystore.KeyPropertie;
+import android.security.keystore.KeyProperties;
 import android.security.keystore.KeyGenParameterSpec;
 
 import java.io.IOException;
