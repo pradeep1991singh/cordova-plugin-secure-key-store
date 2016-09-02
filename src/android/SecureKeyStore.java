@@ -188,7 +188,6 @@ public class SecureKeyStore extends CordovaPlugin {
             Log.d(TAG, "Public Key is: " + kp.getPublic().toString());
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "Error", e);
-            return false;
         }
     }
 
@@ -247,7 +246,6 @@ public class SecureKeyStore extends CordovaPlugin {
             return result;
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "Error", e);
-            return false;
         }
     }
 
@@ -307,7 +305,6 @@ public class SecureKeyStore extends CordovaPlugin {
             return s.verify(signature);
         } catch (IllegalArgumentException e) {
             Log.e(TAG, "Error", e);
-            return false;
         }
 
     }
