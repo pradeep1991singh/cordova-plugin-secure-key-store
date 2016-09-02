@@ -9,9 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.KeyPairGenerator;
-import javax.crypto.SecretKey;
-import java.security.KeyStore;
+//import javax.crypto.SecretKey;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -25,8 +23,8 @@ import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
-//import java.security.KeyPairGenerator;
-//import java.security.KeyStore;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -133,38 +131,57 @@ public class SecureKeyStore extends CordovaPlugin {
      * Creates a public and private key and stores it using the Android Key Store, so that only
      * this application will be able to access the keys.
      */
-    public void createKeys(Context context) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    public void createKeys(Context context) throws NoSuchProviderException,
+            NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         // Create a start and end time, for the validity range of the key pair that's about to be
         // generated.
-        Calendar start = new GregorianCalendar();
-        Calendar end = new GregorianCalendar();
-        end.add(Calendar.YEAR, 1);
+//        Calendar start = new GregorianCalendar();
+//        Calendar end = new GregorianCalendar();
+//        end.add(Calendar.YEAR, 1);
+//
+//
+//        // The KeyPairGeneratorSpec object is how parameters for your key pair are passed
+//        // to the KeyPairGenerator.  For a fun home game, count how many classes in this sample
+//        // start with the phrase "KeyPair".
+//        KeyPairGeneratorSpec spec =
+//                new KeyPairGeneratorSpec.Builder(context)
+//                        // You'll use the alias later to retrieve the key.  It's a key for the key!
+//                        .setAlias(mAlias)
+//                                // The subject used for the self-signed certificate of the generated pair
+//                        .setSubject(new X500Principal("CN=" + mAlias))
+//                                // The serial number used for the self-signed certificate of the
+//                                // generated pair.
+//                        .setSerialNumber(BigInteger.valueOf(1337))
+//                                // Date range of validity for the generated pair.
+//                        .setStartDate(start.getTime())
+//                        .setEndDate(end.getTime())
+//                        .build();
+//
+//        // Initialize a KeyPair generator using the the intended algorithm (in this example, RSA
+//        // and the KeyStore.  This example uses the AndroidKeyStore.
+//        KeyPairGenerator kpGenerator = KeyPairGenerator
+//                .getInstance("RSA",
+//                        "AndroidKeyStore");
+//        kpGenerator.initialize(spec);
+//        KeyPair kp = kpGenerator.generateKeyPair();
 
+        /*
+         * Generate a new EC key pair entry in the Android Keystore by
+         * using the KeyPairGenerator API. The private key can only be
+         * used for signing or verification and only with SHA-256 or
+         * SHA-512 as the message digest.
+         */
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance(
+                KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
+        kpg.initialize(new KeyGenParameterSpec.Builder(
+                alias,
+                KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
+                .setDigests(KeyProperties.DIGEST_SHA256,
+                        KeyProperties.DIGEST_SHA512)
+                .build());
 
-        // The KeyPairGeneratorSpec object is how parameters for your key pair are passed
-        // to the KeyPairGenerator.  For a fun home game, count how many classes in this sample
-        // start with the phrase "KeyPair".
-        KeyPairGeneratorSpec spec =
-                new KeyPairGeneratorSpec.Builder(context)
-                        // You'll use the alias later to retrieve the key.  It's a key for the key!
-                        .setAlias(mAlias)
-                                // The subject used for the self-signed certificate of the generated pair
-                        .setSubject(new X500Principal("CN=" + mAlias))
-                                // The serial number used for the self-signed certificate of the
-                                // generated pair.
-                        .setSerialNumber(BigInteger.valueOf(1337))
-                                // Date range of validity for the generated pair.
-                        .setStartDate(start.getTime())
-                        .setEndDate(end.getTime())
-                        .build();
+        KeyPair kp = kpg.generateKeyPair();
 
-        // Initialize a KeyPair generator using the the intended algorithm (in this example, RSA
-        // and the KeyStore.  This example uses the AndroidKeyStore.
-        KeyPairGenerator kpGenerator = KeyPairGenerator
-                .getInstance("RSA",
-                        "AndroidKeyStore");
-        kpGenerator.initialize(spec);
-        KeyPair kp = kpGenerator.generateKeyPair();
         Log.d(TAG, "Public Key is: " + kp.getPublic().toString());
     }
 
