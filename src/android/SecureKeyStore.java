@@ -48,7 +48,7 @@ public class SecureKeyStore extends CordovaPlugin {
     public static final String TAG = "SecureKeyStore";
 
 
-    public static final String SAMPLE_ALIAS = "myKey";
+//    public static final String SAMPLE_ALIAS = "myKey";
 
     // Some sample data to sign, and later verify using the generated signature.
     public static final String SAMPLE_INPUT="Hello, Android!";
@@ -59,18 +59,18 @@ public class SecureKeyStore extends CordovaPlugin {
     // You can store multiple key pairs in the Key Store.  The string used to refer to the Key you
     // want to store, or later pull, is referred to as an "alias" in this case, because calling it
     // a key, when you use it to retrieve a key, would just be irritating.
-    private String mAlias = null;
+    private String mAlias = "myKey";
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
-        if (action.equals("init")) {
-            setAlias(SAMPLE_ALIAS);
-            return true;
-        }
+//        if (action.equals("init")) {
+//            setAlias(SAMPLE_ALIAS, callbackContext);
+//            return true;
+//        }
 
         if (action.equals("createKeys")) {
-            createKeys(callbackContext);
+            createKeys(mAlias, callbackContext);
             return true;
         }
 
@@ -133,7 +133,7 @@ public class SecureKeyStore extends CordovaPlugin {
      * Creates a public and private key and stores it using the Android Key Store, so that only
      * this application will be able to access the keys.
      */
-    public void createKeys(CallbackContext callbackContext) {
+    public void createKeys(String mAlias, CallbackContext callbackContext) {
         // Create a start and end time, for the validity range of the key pair that's about to be
         // generated.
 //        Calendar start = new GregorianCalendar();
@@ -296,8 +296,8 @@ public class SecureKeyStore extends CordovaPlugin {
 //        return s.verify(signature);
 //    }
 
-    public void setAlias(String alias) {
-        mAlias = alias;
-    }
+//    public void setAlias(String alias) {
+//        mAlias = alias;
+//    }
 
 }

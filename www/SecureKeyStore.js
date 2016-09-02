@@ -1,8 +1,8 @@
 var exec = require('cordova/exec');
 
-exports.init = function(success, error) {
-    exec(success, error, "SecureKeyStore", "init");
-};
+//exports.init = function(success, error) {
+//    exec(success, error, "SecureKeyStore", "init");
+//};
 
 exports.createKeys = function(success, error) {
     exec(success, error, "SecureKeyStore", "createKeys");
