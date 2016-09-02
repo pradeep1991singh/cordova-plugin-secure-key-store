@@ -175,7 +175,7 @@ public class SecureKeyStore extends CordovaPlugin {
         KeyPairGenerator kpg = KeyPairGenerator.getInstance(
                 KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
         kpg.initialize(new KeyGenParameterSpec.Builder(
-                alias,
+                mAlias,
                 KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
                 .setDigests(KeyProperties.DIGEST_SHA256,
                         KeyProperties.DIGEST_SHA512)
