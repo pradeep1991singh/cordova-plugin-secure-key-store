@@ -9,6 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.crypto.SecretKey;
+import java.security.KeyStore;
+
 /**
  * This class echoes a string called from JavaScript.
  */
@@ -32,17 +35,10 @@ public class SecureKeyStore extends CordovaPlugin {
     }
 
     private void setKey(String key, CallbackContext callbackContext) {
-//        if (message != null && message.length() > 0) {
-//            callbackContext.success(message);
-//        } else {
-//            callbackContext.error("Expected one non-empty string argument.");
-//        }
-//        private static void writeSecretKeyToKeystore(SecretKey secretKey, Context context) {
         KeyStore keyStore = null;
         try {
             keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
-//                KeyStore.SecretKeyEntry secretKeyEntry = new KeyStore.SecretKeyEntry(secretKey);
             keyStore.setEntry(
                     "signPk",
                     new KeyStore.SecretKeyEntry(key),
