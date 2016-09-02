@@ -68,7 +68,7 @@ public class SecureKeyStore extends CordovaPlugin {
         }
 
         if (action.equals("createKeys")) {
-            createKeys(getActivity());
+            createKeys();
             return true;
         }
 
