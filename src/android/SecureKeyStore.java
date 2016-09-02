@@ -17,6 +17,7 @@ import android.security.KeyPairGeneratorSpec;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
+import android.security.keystore.KeyProperties;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -131,7 +132,7 @@ public class SecureKeyStore extends CordovaPlugin {
      * Creates a public and private key and stores it using the Android Key Store, so that only
      * this application will be able to access the keys.
      */
-    public void createKeys(Context context) throws NoSuchProviderException,
+    public void createKeys() throws NoSuchProviderException,
             NoSuchAlgorithmException, InvalidAlgorithmParameterException {
         // Create a start and end time, for the validity range of the key pair that's about to be
         // generated.
