@@ -13,11 +13,11 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.security.keystore;
 import android.security.KeyPairGeneratorSpec;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
-import android.security.keystore.KeyProperties;
 
 import java.io.IOException;
 import java.math.BigInteger;
