@@ -9,8 +9,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import
-
 /**
  * This class echoes a string called from JavaScript.
  */
