@@ -1,6 +1,6 @@
 {
   "name": "SecureKeyStore",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Secure keystore cordova plugin",
   "cordova": {
     "id": "cordova-plugin-secure-key-store",

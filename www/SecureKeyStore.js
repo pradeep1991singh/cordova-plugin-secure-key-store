@@ -1,17 +1,9 @@
-var exec = require('cordova/exec');
+// JS interface
 
-//exports.init = function(success, error) {
-//    exec(success, error, "SecureKeyStore", "init");
-//};
-
-exports.createKeys = function(success, error) {
-    exec(success, error, "SecureKeyStore", "createKeys");
+window.keyEncryptInput = function(alias, input, success, error) {
+    cordova.exec(success, error, "SecureKeyStore", "encrypt", [alias, input]);
 };
 
-//exports.signData = function(arg0, success, error) {
-//    exec(success, error, "SecureKeyStore", "signData");
-//};
-//
-//exports.verifyData = function(success, error) {
-//    exec(success, error, "SecureKeyStore", "verifyData");
-//};
+window.keyDecryptInput = function(alias, cipherText, success, error) {
+    cordova.exec(success, error, "SecureKeyStore", "decrypt", [alias, cipherText]);
+};
