@@ -1,7 +1,7 @@
 {
-  "name": "SecureKeyStore",
-  "version": "1.1.1",
-  "description": "Secure keystore cordova plugin",
+  "name": "cordova-plugin-secure-key-store",
+  "version": "1.1.2",
+  "description": "Cordova plugin for secure saving keys to device",
   "cordova": {
     "id": "cordova-plugin-secure-key-store",
     "platforms": [
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pradeep1991singh/secure-key-store.git"
+    "url": "git+https://github.com/pradeep1991singh/cordova-plugin-secure-key-store.git"
   },
   "keywords": [
     "ecosystem:cordova",
@@ -19,7 +19,7 @@
   "author": "pradeep singh",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/pradeep1991singh/secure-key-store/issues"
+    "url": "https://github.com/pradeep1991singh/cordova-plugin-secure-key-store/issues"
   },
-  "homepage": "https://github.com/pradeep1991singh/secure-key-store#readme"
+  "homepage": "https://github.com/pradeep1991singh/cordova-plugin-secure-key-store#readme"
 }

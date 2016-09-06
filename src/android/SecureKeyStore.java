@@ -93,7 +93,7 @@ public class SecureKeyStore extends CordovaPlugin {
             byte[] vals = outputStream.toByteArray();
 
             // writing key to storage
-            KeyStorage.writeValues(getContext(), vals);
+            KeyStorage.writeValues(getContext(), alias, vals);
             Log.i(Constants.TAG, "key created and stored successfully");
             callbackContext.success("key created and stored successfully");
 
@@ -116,7 +116,7 @@ public class SecureKeyStore extends CordovaPlugin {
             Cipher output = Cipher.getInstance(Constants.RSA_ALGORITHM);
             output.init(Cipher.DECRYPT_MODE, privateKey);
             CipherInputStream cipherInputStream = new CipherInputStream(
-                    new ByteArrayInputStream(KeyStorage.readValues(getContext())), output);
+                    new ByteArrayInputStream(KeyStorage.readValues(getContext(), alias)), output);
 
             ArrayList<Byte> values = new ArrayList<Byte>();
             int nextByte;

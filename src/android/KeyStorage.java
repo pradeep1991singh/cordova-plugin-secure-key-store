@@ -13,10 +13,10 @@ import java.io.FileOutputStream;
 
 public final class KeyStorage {
 
-    public static void writeValues(Context context, byte[] vals)  {
+    public static void writeValues(Context context, String keyAlias, byte[] vals)  {
 
         try {
-            FileOutputStream fos = context.openFileOutput(Constants.SKS_FILENAME, context.MODE_PRIVATE);
+            FileOutputStream fos = context.openFileOutput(Constants.SKS_FILENAME + keyAlias, context.MODE_PRIVATE);
             fos.write(vals);
             fos.close();
         } catch (Exception e) {
@@ -24,10 +24,10 @@ public final class KeyStorage {
         }
     }
 
-    public static byte[] readValues(Context context) {
+    public static byte[] readValues(Context context, String keyAlias) {
 
         try {
-            FileInputStream fis = context.openFileInput(Constants.SKS_FILENAME);
+            FileInputStream fis = context.openFileInput(Constants.SKS_FILENAME + keyAlias);
             byte[] buffer = new byte[8192];
             int bytesRead;
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
