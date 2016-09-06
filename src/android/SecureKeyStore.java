@@ -1,4 +1,4 @@
-package com.securekeystore.plugins;
+package com.securekeystore.plugin;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
@@ -17,6 +17,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.lang.StringBuffer;
 import java.util.Calendar;
 
 import javax.crypto.Cipher;
@@ -25,12 +28,6 @@ import javax.crypto.CipherOutputStream;
 import javax.security.auth.x500.X500Principal;
 
 public class SecureKeyStore extends CordovaPlugin {
-
-    public static final String KEYSTORE_PROVIDER_ANDROID_KEYSTORE = "AndroidKeyStore";
-
-    public static final String RSA_ALGORITHM = "RSA/ECB/PKCS1Padding";
-
-    public static final String TAG = "SecureKeyStore";
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -44,8 +41,7 @@ public class SecureKeyStore extends CordovaPlugin {
 
         if (action.equals("decrypt")) {
             String alias = args.getString(0);
-            String cipherText = args.getString(1);
-            this.decrypt(alias, cipherText, callbackContext);
+            this.decrypt(alias, callbackContext);
             return true;
         }
 
@@ -56,7 +52,7 @@ public class SecureKeyStore extends CordovaPlugin {
 
         try {
 
-            KeyStore keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER_ANDROID_KEYSTORE);
+            KeyStore keyStore = KeyStore.getInstance(Constants.KEYSTORE);
             keyStore.load(null);
 
             if (!keyStore.containsAlias(alias)) {
@@ -64,7 +60,7 @@ public class SecureKeyStore extends CordovaPlugin {
                 Calendar end = Calendar.getInstance();
                 end.add(Calendar.YEAR, 1);
                 KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(
-                        cordova.getActivity().getApplicationContext())
+                        getContext())
                         .setAlias(alias)
                         .setSubject(new X500Principal("CN=" + alias))
                         .setSerialNumber(BigInteger.ONE)
@@ -72,7 +68,7 @@ public class SecureKeyStore extends CordovaPlugin {
                         .setEndDate(end.getTime())
                         .build();
 
-                KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", KEYSTORE_PROVIDER_ANDROID_KEYSTORE);
+                KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", Constants.KEYSTORE);
                 generator.initialize(spec);
 
                 KeyPair keyPair = generator.generateKeyPair();
@@ -81,11 +77,11 @@ public class SecureKeyStore extends CordovaPlugin {
             PublicKey publicKey = keyStore.getCertificate(alias).getPublicKey();
 
             if (input.isEmpty()) {
-                Log.d(TAG, "Exception: input text is empty");
+                Log.d(Constants.TAG, "Exception: input text is empty");
                 return;
             }
 
-            Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
+            Cipher cipher = Cipher.getInstance(Constants.RSA_ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             CipherOutputStream cipherOutputStream = new CipherOutputStream(
@@ -94,30 +90,33 @@ public class SecureKeyStore extends CordovaPlugin {
             cipherOutputStream.close();
             byte[] vals = outputStream.toByteArray();
 
-            callbackContext.success(Base64.encodeToString(vals, Base64.DEFAULT));
+            // writing key to storage
+            KeyStorage.writeValues(getContext(), vals);
+            Log.i(Constants.TAG, "key created and stored successfully');
+            callbackContext.success('');
 
         } catch (Exception e) {
-            Log.d(TAG, "Exception: "  + e.getMessage());
+            Log.e(Constants.TAG, "Exception: "  + e.getMessage());
             callbackContext.error("Exception: "  + e.getMessage());
         }
 
     }
 
-    private void decrypt(String alias, String cipherText, CallbackContext callbackContext) {
+    private void decrypt(String alias, CallbackContext callbackContext) {
 
         try {
 
-            KeyStore keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER_ANDROID_KEYSTORE);
+            KeyStore keyStore = KeyStore.getInstance(Constants.KEYSTORE);
             keyStore.load(null);
-
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
 
-            Cipher output = Cipher.getInstance(RSA_ALGORITHM);
+
+            Cipher output = Cipher.getInstance(Constants.RSA_ALGORITHM);
             output.init(Cipher.DECRYPT_MODE, privateKey);
             CipherInputStream cipherInputStream = new CipherInputStream(
-                    new ByteArrayInputStream(Base64.decode(cipherText, Base64.DEFAULT)), output);
-            ArrayList<Byte> values = new ArrayList<Byte>();
+                    new ByteArrayInputStream(KeyStorage.readValues(getContext())), output);
 
+            ArrayList<Byte> values = new ArrayList<Byte>();
             int nextByte;
             while ((nextByte = cipherInputStream.read()) != -1) {
                 values.add((byte)nextByte);
@@ -126,14 +125,18 @@ public class SecureKeyStore extends CordovaPlugin {
             for(int i = 0; i < bytes.length; i++) {
                 bytes[i] = values.get(i).byteValue();
             }
-            String finalText = new String(bytes, 0, bytes.length, "UTF-8");
 
+            String finalText = new String(bytes, 0, bytes.length, "UTF-8");
             callbackContext.success(finalText);
 
         } catch (Exception e) {
-            Log.d(TAG, "Exception: "  + e.getMessage());
+            Log.e(Constants.TAG, "Exception: "  + e.getMessage());
             callbackContext.error("Exception: "  + e.getMessage());
         }
+    }
+
+    private Context getContext(){
+        return cordova.getActivity().getApplicationContext();
     }
 
 }

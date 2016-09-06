@@ -1,16 +1,18 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="com.securekeystore.plugins" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="com.securekeystore.plugin" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>SecureKeyStore</name>
     <js-module name="SecureKeyStore" src="www/SecureKeyStore.js">
-        <clobbers target="cordova.plugins.SecureKeyStore" />
+        <clobbers target="cordova.plugin.SecureKeyStore" />
     </js-module>
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="SecureKeyStore">
-                <param name="android-package" value="com.securekeystore.plugins.SecureKeyStore" />
+                <param name="android-package" value="com.securekeystore.plugin.SecureKeyStore" />
             </feature>
         </config-file>
         <config-file parent="/*" target="AndroidManifest.xml"></config-file>
-        <source-file src="src/android/SecureKeyStore.java" target-dir="src/com/securekeystore/plugins/SecureKeyStore" />
+        <source-file src="src/android/SecureKeyStore.java" target-dir="src/com/securekeystore/plugin/SecureKeyStore" />
+        <source-file src="src/android/Constants.java" target-dir="src/com/securekeystore/plugin/Constants" />
+        <source-file src="src/android/KeyStorage.java" target-dir="src/com/securekeystore/plugin/KeyStorage" />
     </platform>
 </plugin>
