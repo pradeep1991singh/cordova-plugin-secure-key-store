@@ -1,7 +1,7 @@
 # cordova-plugin-secure-key-store
-Cordova plugin for secure saving keys to device
+Cordova plugin for securely saving keys to device
 
-## Installation:
+## Installation
 
 The plugin can be installed via the Cordova command line interface:
 
@@ -15,11 +15,11 @@ or via github
 cordova plugin add https://github.com/pradeep1991singh/cordova-plugin-secure-key-store
 ```
 
-## Usage:
-### This plugin will add two new methods to window scope,
-one is for encrypting and other for decrypting keys.
+## Usage
 
-For encrypting string `window.SksEncrypt` and  for decrypting `window.SksDecrypt`
+- This plugin will add two new methods to window scope, one is for encrypting and other for decrypting keys.
+
+- For encrypting string `window.SksEncrypt` and  for decrypting `window.SksDecrypt` :
 
 ```js
 window.SksEncrypt("key", 'string to encrypt', function(response) {
