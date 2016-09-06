@@ -72,6 +72,8 @@ public class SecureKeyStore extends CordovaPlugin {
                 generator.initialize(spec);
 
                 KeyPair keyPair = generator.generateKeyPair();
+
+                Log.i(Constants.TAG, "created new key pairs");
             }
 
             PublicKey publicKey = keyStore.getCertificate(alias).getPublicKey();
@@ -92,8 +94,8 @@ public class SecureKeyStore extends CordovaPlugin {
 
             // writing key to storage
             KeyStorage.writeValues(getContext(), vals);
-            Log.i(Constants.TAG, "key created and stored successfully');
-            callbackContext.success('');
+            Log.i(Constants.TAG, "key created and stored successfully");
+            callbackContext.success("key created and stored successfully");
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "Exception: "  + e.getMessage());
