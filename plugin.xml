@@ -10,9 +10,17 @@
                 <param name="android-package" value="com.securekeystore.plugin.SecureKeyStore" />
             </feature>
         </config-file>
-        <config-file parent="/*" target="AndroidManifest.xml"></config-file>
+        <config-file parent="/*" target="AndroidManifest.xml" />
         <source-file src="src/android/SecureKeyStore.java" target-dir="src/com/securekeystore/plugin/SecureKeyStore" />
         <source-file src="src/android/Constants.java" target-dir="src/com/securekeystore/plugin/Constants" />
         <source-file src="src/android/KeyStorage.java" target-dir="src/com/securekeystore/plugin/KeyStorage" />
+    </platform>
+    <platform name="ios">
+        <config-file parent="/*" target="config.xml">
+            <feature name="SecureKeyStore">
+                <param name="ios-package" value="SecureKeyStore" />
+            </feature>
+        </config-file>
+        <source-file src="src/ios/SecureKeyStore.m" />
     </platform>
 </plugin>
