@@ -1,6 +1,9 @@
 /********* SecureKeyStore.m Cordova Plugin Implementation *******/
 
+#import <Foundation/Foundation.h>
+#import <Security/Security.h>
 #import <Cordova/CDV.h>
+#import "KeychainItemWrapper.m"
 
 @interface SecureKeyStore : CDVPlugin {
   // Member variables go here.
@@ -19,7 +22,10 @@
     NSString* input = [command.arguments objectAtIndex:1];
 
     if (alias != nil && [alias length] > 0) {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:alias];
+        KeychainItemWrapper *keychainItem = [[KeychainItemWrapper alloc] initWithIdentifier:@"SKSKeyStore" accessGroup:nil];
+        [keychainItem setObject:@input forKey:alias];
+
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:input];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
     }
@@ -33,7 +39,9 @@
     NSString* alias = [command.arguments objectAtIndex:0];
 
     if (alias != nil && [alias length] > 0) {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:alias];
+        NSString *finalText = [keychainItem objectForKey:alias];
+
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:finalText];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
     }
