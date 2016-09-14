@@ -1,9 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <plugin id="com.securekeystore.plugin" version="1.1.2" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+
     <name>SecureKeyStore</name>
+
     <js-module name="SecureKeyStore" src="www/SecureKeyStore.js">
         <clobbers target="cordova.plugin.SecureKeyStore" />
     </js-module>
+
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="SecureKeyStore">
@@ -15,12 +18,16 @@
         <source-file src="src/android/Constants.java" target-dir="src/com/securekeystore/plugin/Constants" />
         <source-file src="src/android/KeyStorage.java" target-dir="src/com/securekeystore/plugin/KeyStorage" />
     </platform>
+
     <platform name="ios">
         <config-file parent="/*" target="config.xml">
             <feature name="SecureKeyStore">
                 <param name="ios-package" value="SecureKeyStore" />
             </feature>
         </config-file>
+        <header-file src="src/ios/KeychainItemWrapper.h" />
+        <source-file src="src/ios/KeychainItemWrapper.m" />
         <source-file src="src/ios/SecureKeyStore.m" />
     </platform>
+
 </plugin>

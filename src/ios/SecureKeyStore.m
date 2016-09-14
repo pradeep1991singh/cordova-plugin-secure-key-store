@@ -1,7 +1,7 @@
 /********* SecureKeyStore.m Cordova Plugin Implementation *******/
 
 #import <Cordova/CDV.h>
-#import "KeychainItemWrapper.h";
+#import "KeychainItemWrapper.m"
 
 @interface SecureKeyStore : CDVPlugin {
   // Member variables go here.
@@ -21,10 +21,11 @@
 
     if (alias != nil && [alias length] > 0) {
         
-        KeychainItemWrapper *keychainItem = [[KeychainItemWrapper alloc] initWithIdentifier:@"SKSKeyStore" accessGroup:nil];
-        [keychainItem setObject:@input forKey:alias];  
-             
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:alias];
+        KeychainItemWrapper* keychain = [[KeychainItemWrapper alloc] initWithIdentifier:alias accessGroup:nil];
+        [keychain setObject:input forKey:kSecValueData];
+        NSLog(@"TOKEN:%@",[keychain objectForKey:kSecValueData]);  
+                    
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:input];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
     }
@@ -39,8 +40,10 @@
 
     if (alias != nil && [alias length] > 0) {
         
-        NSString *finalText = [keychainItem objectForKey:alias];                          
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:finalText];
+
+              
+        // NSString *finalText = [keychainItem objectForKey:alias];
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:alias];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
     }
