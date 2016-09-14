@@ -20,14 +20,27 @@
     </platform>
 
     <platform name="ios">
-        <config-file parent="/*" target="config.xml">
+        <!--<config-file parent="/*" target="config.xml">
             <feature name="SecureKeyStore">
                 <param name="ios-package" value="SecureKeyStore" />
             </feature>
         </config-file>
         <header-file src="src/ios/KeychainItemWrapper.h" />
         <source-file src="src/ios/KeychainItemWrapper.m" />
-        <source-file src="src/ios/SecureKeyStore.m" />
+        <source-file src="src/ios/SecureKeyStore.m" />-->
+        <config-file target="config.xml" parent="/widget">
+          <feature name="SecureKeyStore">
+            <param name="ios-package" value="CDVKeychain"/>
+          </feature>
+        </config-file>
+
+        <header-file src="src/ios/CDVKeychain.h" />
+        <header-file src="src/ios/A0SimpleKeychain.h"/>
+
+        <source-file src="src/ios/CDVKeychain.m"/>
+        <source-file src="src/ios/A0SimpleKeychain.m"/>
+
+        <framework src="Security.framework" />        
     </platform>
 
 </plugin>
