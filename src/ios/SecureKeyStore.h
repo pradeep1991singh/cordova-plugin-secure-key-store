@@ -21,7 +21,7 @@
 #import <Foundation/Foundation.h>
 #import <Cordova/CDVPlugin.h>
 
-@interface CDVKeychain : CDVPlugin {
+@interface SecureKeyStore : CDVPlugin {
 }
 
 - (void) get:(CDVInvokedUrlCommand*)command;

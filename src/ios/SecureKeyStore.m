@@ -20,7 +20,7 @@
 #import "SecureKeyStore.h"
 #import "A0SimpleKeychain.h"
 
-@implementation CDVKeychain
+@implementation SecureKeyStore
 
 - (void) get:(CDVInvokedUrlCommand*)command {
   [self.commandDelegate runInBackground:^{
