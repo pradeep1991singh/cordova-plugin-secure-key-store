@@ -32,18 +32,24 @@ public class SecureKeyStore extends CordovaPlugin {
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
-        if (action.equals("encrypt")) {
+        if (action.equals("set")) {
             String alias = args.getString(0);
             String input = args.getString(1);
             this.encrypt(alias, input, callbackContext);
             return true;
         }
 
-        if (action.equals("decrypt")) {
+        if (action.equals("get")) {
             String alias = args.getString(0);
             this.decrypt(alias, callbackContext);
             return true;
         }
+
+        if (action.equals("remove")) {
+            String alias = args.getString(0);
+            this.removeKeyFile(alias, callbackContext);
+            return true;
+        }        
 
         return false;
     }
@@ -136,6 +142,18 @@ public class SecureKeyStore extends CordovaPlugin {
             callbackContext.error("Exception: "  + e.getMessage());
         }
     }
+
+    private void removeKeyFile(String alias, CallbackContext callbackContext) {
+        try {
+            KeyStorage.resetValues(getContext(), alias);
+            Log.i(Constants.TAG, "keys removed successfully");
+            callbackContext.success("keys removed successfully");
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "Exception: "  + e.getMessage());
+            callbackContext.error("Exception: "  + e.getMessage());
+        }
+    }    
 
     private Context getContext(){
         return cordova.getActivity().getApplicationContext();

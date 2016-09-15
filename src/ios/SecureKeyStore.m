@@ -1,54 +1,111 @@
-/********* SecureKeyStore.m Cordova Plugin Implementation *******/
+/*
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
 
-#import <Cordova/CDV.h>
-#import "KeychainItemWrapper.m"
+ http://www.apache.org/licenses/LICENSE-2.0
 
-@interface SecureKeyStore : CDVPlugin {
-  // Member variables go here.
-}
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+ */
 
-- (void)encrypt:(CDVInvokedUrlCommand*)command;
-- (void)decrypt:(CDVInvokedUrlCommand*)command;
-@end
+#import "SecureKeyStore.h"
+#import "A0SimpleKeychain.h"
 
-@implementation SecureKeyStore
+@implementation CDVKeychain
 
-- (void)encrypt:(CDVInvokedUrlCommand*)command
-{
+- (void) get:(CDVInvokedUrlCommand*)command {
+  [self.commandDelegate runInBackground:^{
+    NSArray* arguments = command.arguments;
     CDVPluginResult* pluginResult = nil;
-    NSString* alias = [command.arguments objectAtIndex:0];
-    NSString* input = [command.arguments objectAtIndex:1];
 
-    if (alias != nil && [alias length] > 0) {
-        
-        KeychainItemWrapper* keychain = [[KeychainItemWrapper alloc] initWithIdentifier:alias accessGroup:nil];
-        [keychain setObject:input forKey:kSecValueData];
-        NSLog(@"TOKEN:%@",[keychain objectForKey:kSecValueData]);  
-                    
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:input];
-    } else {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+    if([arguments count] < 2) {
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+      messageAsString:@"incorrect number of arguments for getWithTouchID"];
+      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+      return;
     }
 
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
+    NSString *key = [arguments objectAtIndex:0];
+    NSString *touchIDMessage = [arguments objectAtIndex:1];
 
-- (void)decrypt:(CDVInvokedUrlCommand*)command
-{
-    CDVPluginResult* pluginResult = nil;
-    NSString* alias = [command.arguments objectAtIndex:0];
-
-    if (alias != nil && [alias length] > 0) {
-        
-
-              
-        // NSString *finalText = [keychainItem objectForKey:alias];
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:alias];
-    } else {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+    NSString *message = NSLocalizedString(@"Please Authenticate", nil);
+    if(![touchIDMessage isEqual:[NSNull null]]) {
+      message = NSLocalizedString(touchIDMessage, @"Prompt TouchID message");
     }
 
+    A0SimpleKeychain *keychain = [A0SimpleKeychain keychain];
+
+    keychain.useAccessControl = YES;
+    keychain.defaultAccessiblity = A0SimpleKeychainItemAccessibleWhenPasscodeSetThisDeviceOnly;
+
+    NSString *value = [keychain stringForKey:key promptMessage:message];
+
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+  }];
+}
+
+- (void) set:(CDVInvokedUrlCommand*)command {
+  [self.commandDelegate runInBackground:^{
+    NSArray* arguments = command.arguments;
+    CDVPluginResult* pluginResult = nil;
+
+    if([arguments count] < 3) {
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+      messageAsString:@"incorrect number of arguments for setWithTouchID"];
+      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+      return;
+    }
+
+    NSString* key = [arguments objectAtIndex:0];
+    NSString* value = [arguments objectAtIndex:1];
+    BOOL useTouchID = [[arguments objectAtIndex:2] boolValue];
+
+      NSLog(@"SET %@ %@ %d", key ,value, useTouchID);
+
+    A0SimpleKeychain *keychain = [A0SimpleKeychain keychain];
+
+    if(useTouchID) {
+      keychain.useAccessControl = YES;
+      keychain.defaultAccessiblity = A0SimpleKeychainItemAccessibleWhenPasscodeSetThisDeviceOnly;
+    }
+
+    [keychain setString:value forKey:key];
+
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+  }];
+}
+
+- (void) remove:(CDVInvokedUrlCommand*)command {
+  [self.commandDelegate runInBackground:^{
+    NSArray* arguments = command.arguments;
+    CDVPluginResult* pluginResult = nil;
+
+    if([arguments count] < 1) {
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+      messageAsString:@"incorrect number of arguments for remove"];
+      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+      return;
+    }
+
+    NSString *key = [arguments objectAtIndex:0];
+
+    A0SimpleKeychain *keychain = [A0SimpleKeychain keychain];
+    [keychain deleteEntryForKey:key];
+
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+  }];
 }
 
 @end

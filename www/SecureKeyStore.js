@@ -1,27 +1,20 @@
-// JS interface   
+// JS interface
+var exec = require('cordova/exec');
 
-switch (cordova.platformId) {
-case 'ios':
-    window.SksEncrypt = function(alias, input, success, error) {
-        cordova.exec(success, error, "SecureKeyStore", "set", [key, value, useTouchID]);
-    };
+var SecureKeyStore = {
+	serviceName: "SecureKeyStore",
 
-    window.SksDecrypt = function(alias, success, error) {
-        cordova.exec(success, error, "SecureKeyStore", "get", [key, touchIDMessage]);
-    };
+	set: function(success, error, key, value, useTouchID) {
+		exec(success, error, this.serviceName, "set", [key, value, useTouchID]);
+	},
 
-    window.SkRemove = function(alias, success, error) {
-        cordova.exec(success, error, "SecureKeyStore", "remove", [key]);
-    };    
-    break;
+	get: function(success, error, key, touchIDMessage) {
+		exec(success, error, this.serviceName, "get", [key, touchIDMessage]);
+	},
 
-case 'android':
-    window.SksEncrypt = function(alias, input, success, error) {
-        cordova.exec(success, error, "SecureKeyStore", "encrypt", [alias, input]);
-    };
+	remove: function(success, error, key) {
+		exec(success, error, this.serviceName, "remove", [key]);
+	}
+};
 
-    window.SksDecrypt = function(alias, success, error) {
-        cordova.exec(success, error, "SecureKeyStore", "decrypt", [alias]);
-    };
-    break;
-}
+module.exports = SecureKeyStore;
