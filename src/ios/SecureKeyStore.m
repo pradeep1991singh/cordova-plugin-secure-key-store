@@ -75,7 +75,7 @@
     NSString* key = (NSString*)[command.arguments objectAtIndex:0];
     @try {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Key removed successfully"];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
     @catch(NSException *exception) {
