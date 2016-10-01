@@ -1,18 +1,47 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="com.securekeystore.plugin" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="cordova-plugin-secure-key-store"
+    version="1.1.2"
+    xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
     <name>SecureKeyStore</name>
+    <author>pradeep1991singh</author>
+
+    <description>
+        Secure store, encrypted store key value kair support cordova plugin in iOS and Android.
+    </description>
+
+    <license>MIT</license>
+
+    <keywords>keystore, android, keychain, ios, encryption, decryption, security, public key, private key</keywords>
+
     <js-module name="SecureKeyStore" src="www/SecureKeyStore.js">
-        <clobbers target="cordova.plugin.SecureKeyStore" />
+        <clobbers target="cordova.plugins.SecureKeyStore" />
     </js-module>
+
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="SecureKeyStore">
                 <param name="android-package" value="com.securekeystore.plugin.SecureKeyStore" />
             </feature>
         </config-file>
-        <config-file parent="/*" target="AndroidManifest.xml"></config-file>
+        <config-file parent="/*" target="AndroidManifest.xml" />
         <source-file src="src/android/SecureKeyStore.java" target-dir="src/com/securekeystore/plugin/SecureKeyStore" />
         <source-file src="src/android/Constants.java" target-dir="src/com/securekeystore/plugin/Constants" />
         <source-file src="src/android/KeyStorage.java" target-dir="src/com/securekeystore/plugin/KeyStorage" />
     </platform>
+
+    <platform name="ios">
+        <config-file parent="/*" target="config.xml">
+            <feature name="SecureKeyStore">
+                <param name="ios-package" value="SecureKeyStore" />
+            </feature>
+        </config-file>
+        <header-file src="src/ios/SecureKeyStore.h" />
+        <header-file src="src/ios/KeychainWrapper.h"/>
+        <source-file src="src/ios/SecureKeyStore.m"/>
+        <source-file src="src/ios/KeychainWrapper.m"/>
+        <framework src="Security.framework" />        
+    </platform>
+
 </plugin>

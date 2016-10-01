@@ -1,9 +1,20 @@
 // JS interface
+var exec = require('cordova/exec');
 
-window.SksEncrypt = function(alias, input, success, error) {
-    cordova.exec(success, error, "SecureKeyStore", "encrypt", [alias, input]);
+var SecureKeyStore = {
+	serviceName: "SecureKeyStore",
+
+	set: function(success, error, key, value) {
+		exec(success, error, this.serviceName, "set", [key, value]);
+	},
+
+	get: function(success, error, key) {
+		exec(success, error, this.serviceName, "get", [key]);
+	},
+
+	remove: function(success, error, key) {
+		exec(success, error, this.serviceName, "remove", [key]);
+	}
 };
 
-window.SksDecrypt = function(alias, success, error) {
-    cordova.exec(success, error, "SecureKeyStore", "decrypt", [alias]);
-};
+module.exports = SecureKeyStore;
