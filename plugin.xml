@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-secure-key-storage"
+<plugin id="cordova-plugin-secure-key-store"
     version="1.1.2"
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android">
@@ -38,9 +38,9 @@
             </feature>
         </config-file>
         <header-file src="src/ios/SecureKeyStore.h" />
-        <header-file src="src/ios/A0SimpleKeychain.h"/>
+        <header-file src="src/ios/KeychainWrapper.h"/>
         <source-file src="src/ios/SecureKeyStore.m"/>
-        <source-file src="src/ios/A0SimpleKeychain.m"/>
+        <source-file src="src/ios/KeychainWrapper.m"/>
         <framework src="Security.framework" />        
     </platform>
 
