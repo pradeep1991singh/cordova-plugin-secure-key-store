@@ -19,22 +19,31 @@ cordova plugin add https://github.com/pradeep1991singh/cordova-plugin-secure-key
 
 - This plugin will add two new methods to window scope, one is for encrypting and other for decrypting keys.
 
-- For encrypting string `window.SksEncrypt` and  for decrypting `window.SksDecrypt` :
+- For saving string `cordova.plugins.SecureKeyStore.set`,  for retrieving `cordova.plugins.SecureKeyStore.get`
+and for removing string `cordova.plugins.SecureKeyStore.remove` :
 
 ```js
-window.SksEncrypt("key", 'string to encrypt', function(response) {
-  console.log(response); // response - encrypted string
-}, function(error) {
-    console.log(error);
-});
+cordova.plugins.SecureKeyStore.set(function (res) {
+  console.log(response); // response - decrypted string
+}, function (error) {
+  console.log(error);
+}, "key", 'string to encrypt');
 ```
 
 ```js
-window.SksDecrypt("key", function(response) {
+cordova.plugins.SecureKeyStore.get(function (res) {
   console.log(response); // response - decrypted string
-}, function(error) {
+}, function (error) {
   console.log(error);
-});
+}, "key");
+```
+
+```js
+cordova.plugins.SecureKeyStore.get(function (res) {
+  console.log(response); // response - decrypted string
+}, function (error) {
+  console.log(error);
+}, "key");
 ```
 
 ## License
