@@ -24,7 +24,7 @@ and for removing string `cordova.plugins.SecureKeyStore.remove` :
 
 ```js
 cordova.plugins.SecureKeyStore.set(function (res) {
-  console.log(response); // response - string securely stored
+  console.log(res); // res - string securely stored
 }, function (error) {
   console.log(error);
 }, "key", 'string to encrypt');
@@ -32,7 +32,7 @@ cordova.plugins.SecureKeyStore.set(function (res) {
 
 ```js
 cordova.plugins.SecureKeyStore.get(function (res) {
-  console.log(response); // response - string retrieved
+  console.log(res); // res - string retrieved
 }, function (error) {
   console.log(error);
 }, "key");
@@ -40,7 +40,7 @@ cordova.plugins.SecureKeyStore.get(function (res) {
 
 ```js
 cordova.plugins.SecureKeyStore.remove(function (res) {
-  console.log(response); // response - string removed
+  console.log(res); // res - string removed
 }, function (error) {
   console.log(error);
 }, "key");
