@@ -11,6 +11,7 @@ import android.content.Context;
 import android.util.Log;
 import android.util.Base64;
 import android.security.KeyPairGeneratorSpec;
+import android.os.Build;
 
 import java.security.*;
 import java.math.BigInteger;
@@ -58,7 +59,13 @@ public class SecureKeyStore extends CordovaPlugin {
 
         try {
 
-            KeyStore keyStore = KeyStore.getInstance(Constants.KEYSTORE);
+            KeyStore keyStore;
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                keyStore = KeyStore.getInstance(Constants.KEYSTORE_BELOW_API_23); // < api level 23
+            } else {
+                keyStore = KeyStore.getInstance(Constants.KEYSTORE_ABOVE_API_23); // >= api level 23
+            }
+
             keyStore.load(null);
 
             if (!keyStore.containsAlias(alias)) {
