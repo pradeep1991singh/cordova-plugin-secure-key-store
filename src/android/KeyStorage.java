@@ -1,6 +1,6 @@
 package com.securekeystore.plugin;
 
-// Helper function for storing kyes to internal storage.
+// Helper function for storing keys to internal storage.
 
 import android.content.Context;
 import android.util.Log;
