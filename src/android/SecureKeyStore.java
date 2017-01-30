@@ -1,5 +1,7 @@
 package com.securekeystore.plugin;
 
+// Secure key store main class
+
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 
@@ -59,13 +61,7 @@ public class SecureKeyStore extends CordovaPlugin {
 
         try {
 
-            KeyStore keyStore;
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                keyStore = KeyStore.getInstance(Constants.KEYSTORE_BELOW_API_23); // < api level 23
-            } else {
-                keyStore = KeyStore.getInstance(Constants.KEYSTORE_ABOVE_API_23); // >= api level 23
-            }
-
+            KeyStore keyStore = KeyStore.getInstance(getKeyStore());
             keyStore.load(null);
 
             if (!keyStore.containsAlias(alias)) {
@@ -81,7 +77,7 @@ public class SecureKeyStore extends CordovaPlugin {
                         .setEndDate(end.getTime())
                         .build();
 
-                KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", Constants.KEYSTORE);
+                KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", getKeyStore());
                 generator.initialize(spec);
 
                 KeyPair keyPair = generator.generateKeyPair();
@@ -121,7 +117,7 @@ public class SecureKeyStore extends CordovaPlugin {
 
         try {
 
-            KeyStore keyStore = KeyStore.getInstance(Constants.KEYSTORE);
+            KeyStore keyStore = KeyStore.getInstance(getKeyStore());
             keyStore.load(null);
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
 
@@ -162,8 +158,18 @@ public class SecureKeyStore extends CordovaPlugin {
         }
     }    
 
-    private Context getContext(){
+    private Context getContext() {
         return cordova.getActivity().getApplicationContext();
+    }
+
+    private String getKeyStore() {
+        String keyStoreKey;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            keyStoreKey = Constants.KEYSTORE_BELOW_API_23; // < api level 23
+        } else {
+            keyStoreKey = Constants.KEYSTORE_ABOVE_API_23; // >= api level 23
+        }
+        return keyStoreKey;
     }
 
 }
