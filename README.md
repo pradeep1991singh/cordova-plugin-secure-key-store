@@ -1,5 +1,5 @@
 # cordova-plugin-secure-key-store
-Cordova plugin for securely saving keys to device
+Cordova plugin for securely saving keys, passwords or strings to device
 
 ## Installation
 
@@ -37,6 +37,7 @@ cordova.plugins.SecureKeyStore.get(function (res) {
   console.log(error);
 }, "key");
 ```
+- Apart from above there is one more method for removing saved key
 
 ```js
 cordova.plugins.SecureKeyStore.remove(function (res) {
