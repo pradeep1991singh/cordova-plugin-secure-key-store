@@ -5,7 +5,8 @@
   "cordova": {
     "id": "cordova-plugin-secure-key-store",
     "platforms": [
-      "android"
+      "android",
+      "ios"
     ]
   },
   "repository": {
@@ -14,7 +15,10 @@
   },
   "keywords": [
     "ecosystem:cordova",
-    "cordova-android"
+    "cordova-android",
+    "cordova-ios",
+    "android",
+    "ios"
   ],
   "author": "pradeep singh",
   "license": "ISC",
