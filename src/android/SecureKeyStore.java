@@ -108,7 +108,7 @@ public class SecureKeyStore extends CordovaPlugin {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "Exception: "  + e.getMessage());
-            callbackContext.error("Exception: "  + e.getMessage());
+            callbackContext.error("Api-level:" + Build.VERSION.SDK_INT + "\nException: "  + e.getMessage());
         }
 
     }
@@ -142,7 +142,7 @@ public class SecureKeyStore extends CordovaPlugin {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "Exception: "  + e.getMessage());
-            callbackContext.error("Exception: "  + e.getMessage());
+            callbackContext.error("Api-level:" + Build.VERSION.SDK_INT + "\nException: "  + e.getMessage());
         }
     }
 
@@ -154,7 +154,7 @@ public class SecureKeyStore extends CordovaPlugin {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "Exception: "  + e.getMessage());
-            callbackContext.error("Exception: "  + e.getMessage());
+            callbackContext.error("Api-level:" + Build.VERSION.SDK_INT + "\nException: "  + e.getMessage());
         }
     }    
 
@@ -163,13 +163,19 @@ public class SecureKeyStore extends CordovaPlugin {
     }
 
     private String getKeyStore() {
-        String keyStoreKey;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            keyStoreKey = Constants.KEYSTORE_BELOW_API_23; // < api level 23
-        } else {
-            keyStoreKey = Constants.KEYSTORE_ABOVE_API_23; // >= api level 23
+        try {
+            KeyStore.getInstance(Constants.KEYSTORE_PROVIDER_1);
+            return Constants.KEYSTORE_PROVIDER_1;
         }
-        return keyStoreKey;
+        catch (Exception err) {
+            try {
+                KeyStore.getInstance(Constants.KEYSTORE_PROVIDER_2);
+                return Constants.KEYSTORE_PROVIDER_2;
+            }
+            catch (Exception e) {
+                return Constants.KEYSTORE_PROVIDER_3;
+            }
+        }
     }
 
 }

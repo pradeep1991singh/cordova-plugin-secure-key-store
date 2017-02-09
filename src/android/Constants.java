@@ -5,8 +5,9 @@ package com.securekeystore.plugin;
 public class Constants {
 
     // Key Store
-    public static final String KEYSTORE_BELOW_API_23 = "AndroidOpenSSL";
-    public static final String KEYSTORE_ABOVE_API_23 = "AndroidKeyStore";
+    public static final String KEYSTORE_PROVIDER_1 = "AndroidKeyStore";
+    public static final String KEYSTORE_PROVIDER_2 = "AndroidKeyStoreBCWorkaround";
+    public static final String KEYSTORE_PROVIDER_3 = "AndroidOpenSSL";
     public static final String RSA_ALGORITHM = "RSA/ECB/PKCS1Padding";
     public static final String TAG = "SecureKeyStore";
 
