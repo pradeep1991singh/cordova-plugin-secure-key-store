@@ -1,7 +1,7 @@
 {
   "name": "cordova-plugin-secure-key-store",
-  "version": "1.4.1",
-  "description": "Cordova plugin for secure saving keys to device",
+  "version": "1.4.2",
+  "description": "Cordova plugin for securely saving keys, passwords or strings on devices.",
   "cordova": {
     "id": "cordova-plugin-secure-key-store",
     "platforms": [
@@ -15,10 +15,15 @@
   },
   "keywords": [
     "ecosystem:cordova",
-    "cordova-android",
-    "cordova-ios",
+    "ecosystem:phonegap",
+    "mobile",
     "android",
-    "ios"
+    "ios",
+    "android-keystore",
+    "ios-keychain",
+    "sensitive-data-security",
+    "encryption-decryption",
+    "public-private-key"
   ],
   "author": "pradeep singh",
   "license": "ISC",

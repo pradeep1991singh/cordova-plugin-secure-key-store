@@ -1,5 +1,5 @@
 # cordova-plugin-secure-key-store
-Cordova plugin for securely saving keys, passwords or strings to device
+Cordova plugin for securely saving keys, passwords or strings on devices.
 
 ## Installation
 
