@@ -17,9 +17,9 @@ cordova plugin add https://github.com/pradeep1991singh/cordova-plugin-secure-key
 
 ## Usage
 
-- This plugin will add two new methods to window scope, one is for encrypting and other for decrypting keys.
+This plugin will add three new methods to window scope, for saving sensitive data, retrieving saved data and for removing data.
 
-- For saving string `cordova.plugins.SecureKeyStore.set` and for retrieving `cordova.plugins.SecureKeyStore.get`.
+- For saving use `cordova.plugins.SecureKeyStore.set` 
 
 ```js
 cordova.plugins.SecureKeyStore.set(function (res) {
@@ -29,6 +29,8 @@ cordova.plugins.SecureKeyStore.set(function (res) {
 }, "key", 'string to encrypt');
 ```
 
+- For retrieving use `cordova.plugins.SecureKeyStore.get`.
+
 ```js
 cordova.plugins.SecureKeyStore.get(function (res) {
   console.log(res); // res - string retrieved
@@ -36,7 +38,7 @@ cordova.plugins.SecureKeyStore.get(function (res) {
   console.log(error);
 }, "key");
 ```
-- Apart from above there is one more method for removing saved key
+- And for removing `cordova.plugins.SecureKeyStore.remove`
 
 ```js
 cordova.plugins.SecureKeyStore.remove(function (res) {

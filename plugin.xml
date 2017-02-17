@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <plugin id="cordova-plugin-secure-key-store"
-    version="1.4.2"
+    version="1.4.4"
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <name>SecureKeyStore</name>
-    <author>pradeep1991singh</author>
+    <author>pradeep singh</author>
 
     <description>
         Cordova plugin for securely saving keys, passwords or strings on devices.
@@ -13,10 +13,7 @@
 
     <license>ISC</license>
 
-    <keywords>
-        ecosystem:cordova, ecosystem:phonegap, mobile, android, ios, android-keystore,
-        ios-keychain, sensitive-data-security, public-private-key, encryption-decryption
-    </keywords>
+    <keywords>ecosystem:cordova, ecosystem:phonegap, mobile, android, ios, android-keystore, ios-keychain, sensitive-data-security, public-private-key, encryption-decryption</keywords>
 
     <js-module name="SecureKeyStore" src="www/SecureKeyStore.js">
         <clobbers target="cordova.plugins.SecureKeyStore" />
