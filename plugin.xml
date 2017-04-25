@@ -38,9 +38,9 @@
             </feature>
         </config-file>
         <header-file src="src/ios/SecureKeyStore.h" />
-        <header-file src="src/ios/KeychainWrapper.h"/>
         <source-file src="src/ios/SecureKeyStore.m"/>
-        <source-file src="src/ios/KeychainWrapper.m"/>
+        <source-file src="src/ios/KeychainItemWrapper.h"/>
+        <source-file src="src/ios/KeychainItemWrapper.m"/>        
         <framework src="Security.framework" />        
     </platform>
 

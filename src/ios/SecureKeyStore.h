@@ -18,9 +18,10 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "KeychainWrapper.h"
 #import <Foundation/Foundation.h>
 #import <Cordova/CDV.h>
+
+#import "KeychainItemWrapper.h"
 
 @interface SecureKeyStore : CDVPlugin {
 }

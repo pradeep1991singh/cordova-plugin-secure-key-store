@@ -22,48 +22,95 @@
 
 @implementation SecureKeyStore
 
+- (void) writeToSecureKeyStorage:(NSMutableDictionary*) dict 
+{
+  // get keychain
+  KeychainItemWrapper * keychain = [[KeychainItemWrapper alloc] initWithIdentifier:@"cordova.plugins.SecureKeyStore" accessGroup:nil];
+  NSString *error;
+  
+  // Serialize dictionary and store in keychain
+  NSData *serializedDict = [NSPropertyListSerialization dataFromPropertyList:dict format:NSPropertyListXMLFormat_v1_0 errorDescription:&error];
+  [keychain setObject:serializedDict forKey:(__bridge id)(kSecValueData)];
+  if (error) {
+      NSLog(@"%@", error);
+  }
+}
+
+- (NSMutableDictionary *) readFromSecureKeyStorage 
+{
+  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+  // get keychain
+  KeychainItemWrapper * keychain = [[KeychainItemWrapper alloc] initWithIdentifier:@"cordova.plugins.SecureKeyStore" accessGroup:nil];
+  NSError *error;
+  @try 
+  {
+      NSData *serializedDict = [keychain objectForKey:(__bridge id)(kSecValueData)];
+      NSUInteger dictLength = [serializedDict length];
+      if (dictLength) {
+          // de-serialize dictionary
+          dict = [NSPropertyListSerialization propertyListFromData:serializedDict mutabilityOption:NSPropertyListImmutable format:nil errorDescription:&error];
+          if (error) {
+              NSLog(@"Exception: %@", error);
+          }
+      }
+  }
+  @catch (NSException * exception)
+  {
+      NSLog(@"Exception: %@", exception);
+  }
+  return dict;
+}
+
 - (void) set:(CDVInvokedUrlCommand*)command 
 {
   CDVPluginResult* pluginResult = nil;
   NSString* key = [command.arguments objectAtIndex:0];
-  NSString* value = [command.arguments objectAtIndex:1];  
+  NSString* value = [command.arguments objectAtIndex:1]; 
+
   @try {
-    KeychainWrapper* keychain = [[KeychainWrapper alloc]init];
-    [keychain mySetObject:value forKey:(__bridge id)(kSecValueData)];
-    [keychain writeToKeychain];
+    // get mutable dictionary and store data
+    [self.commandDelegate runInBackground:^{
+		@synchronized(self) {
+            NSMutableDictionary *dict = [self readFromSecureKeyStorage];
+            [dict setValue: value forKey: key];
+            [self writeToSecureKeyStorage:dict];     
 
-    [[NSUserDefaults standardUserDefaults]setBool:true forKey:key];
-    [[NSUserDefaults standardUserDefaults]synchronize];     
-
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Key saved to keychain successfully"];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Key saved to keychain successfully"];
+            [self.commandDelegate 
+            sendPluginResult:pluginResult callbackId:command.callbackId];
+        }
+    }];
+  }
+  @catch (NSException* exception)
+  {
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:exception];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
   }
-  @catch(NSException* exception){
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: @"Exception: saving key into keychain"];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-  }      
 }
 
 - (void) get:(CDVInvokedUrlCommand*)command 
 {
   CDVPluginResult* pluginResult = nil;
   NSString* key = [command.arguments objectAtIndex:0];
+
   @try {
+    [self.commandDelegate runInBackground:^{
+		@synchronized(self) {      
+            // get mutable dictionaly and retrieve store data
+            NSMutableDictionary *dict = [self readFromSecureKeyStorage];
+            NSString *value = nil;
 
-    BOOL hasKey = [[NSUserDefaults standardUserDefaults] boolForKey:key];
-    if (hasKey) {
-      KeychainWrapper* keychain = [[KeychainWrapper alloc]init];
-      NSString *value = [keychain myObjectForKey:@"v_Data"];
+            if (dict != nil) {
+                        value =[dict valueForKey:key];
+                }
 
-      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
-      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];      
-    } else {
-      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: @"Exception: key not found in keychain"];
-      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];      
-    }
-
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }
+    }];
   }
-  @catch(NSException* exception){
+  @catch (NSException* exception)
+  {
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: @"Exception: fetching key from keychain"];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
   } 
@@ -71,17 +118,25 @@
 
 - (void) remove:(CDVInvokedUrlCommand*)command 
 {
-	 	CDVPluginResult* pluginResult = nil;
-    NSString* key = (NSString*)[command.arguments objectAtIndex:0];
-    @try {
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Key removed successfully"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }
-    @catch(NSException *exception) {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: @"Exception: Could not delete key from keychain"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }
+  CDVPluginResult* pluginResult = nil;
+  NSString* key = (NSString*)[command.arguments objectAtIndex:0];
+  @try {
+    [self.commandDelegate runInBackground:^{
+		@synchronized(self) {      
+            // get mutable dictionary and remove key from store
+            NSMutableDictionary *dict = [self readFromSecureKeyStorage];
+            [dict removeObjectForKey:key];
+            [self writeToSecureKeyStorage:dict];     
+
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Key removed successfully"];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }
+    }];   
+  }
+  @catch(NSException *exception) {
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: @"Exception: Could not delete key from keychain"];
+      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+  }
 }
 
 @end
