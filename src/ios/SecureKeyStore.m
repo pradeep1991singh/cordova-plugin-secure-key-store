@@ -50,15 +50,23 @@
           // de-serialize dictionary
           dict = [NSPropertyListSerialization propertyListFromData:serializedDict mutabilityOption:NSPropertyListImmutable format:nil errorDescription:&error];
           if (error) {
-              NSLog(@"Exception: %@", error);
+              NSLog(@"Read process Exception: %@", error);
           }
       }
   }
   @catch (NSException * exception)
   {
-      NSLog(@"Exception: %@", exception);
+      NSLog(@"Read exception: %@", exception);
   }
   return dict;
+}
+
+- (void) removeKeyFromSecureKeyStore:(NSString*) key
+{
+    // get mutable dictionary and remove key from store
+    NSMutableDictionary *dict = [self readFromSecureKeyStorage];
+    [dict removeObjectForKey:key];
+    [self writeToSecureKeyStorage:dict];     
 }
 
 - (void) set:(CDVInvokedUrlCommand*)command 
@@ -68,6 +76,11 @@
   NSString* value = [command.arguments objectAtIndex:1]; 
 
   @try {
+    // set flag
+    NSString *keyFlag = value;
+    [[NSUserDefaults standardUserDefaults] setObject:keyFlag forKey:key];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+
     // get mutable dictionary and store data
     [self.commandDelegate runInBackground:^{
 		@synchronized(self) {
@@ -94,20 +107,26 @@
   NSString* key = [command.arguments objectAtIndex:0];
 
   @try {
-    [self.commandDelegate runInBackground:^{
-		@synchronized(self) {      
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:key]) {
+      [self.commandDelegate runInBackground:^{
+		    @synchronized(self) {      
             // get mutable dictionaly and retrieve store data
             NSMutableDictionary *dict = [self readFromSecureKeyStorage];
             NSString *value = nil;
 
             if (dict != nil) {
-                        value =[dict valueForKey:key];
-                }
+                value =[dict valueForKey:key];
+            }
 
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }
-    }];
+      }];
+    } else {
+      [self removeKeyFromSecureKeyStore:key];
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: @"Exception: key not present in keychain"];
+      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];      
+    }
   }
   @catch (NSException* exception)
   {
@@ -121,17 +140,17 @@
   CDVPluginResult* pluginResult = nil;
   NSString* key = (NSString*)[command.arguments objectAtIndex:0];
   @try {
-    [self.commandDelegate runInBackground:^{
-		@synchronized(self) {      
-            // get mutable dictionary and remove key from store
-            NSMutableDictionary *dict = [self readFromSecureKeyStorage];
-            [dict removeObjectForKey:key];
-            [self writeToSecureKeyStorage:dict];     
+      // remove key flag
+      [[NSUserDefaults standardUserDefaults] removeObjectForKey:key]; 
+      [[NSUserDefaults standardUserDefaults] synchronize];
 
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Key removed successfully"];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        }
-    }];   
+      [self.commandDelegate runInBackground:^{
+          @synchronized(self) {      
+              [self removeKeyFromSecureKeyStore:key];
+              CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Key removed successfully"];
+              [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+          }
+      }];   
   }
   @catch(NSException *exception) {
       pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: @"Exception: Could not delete key from keychain"];
