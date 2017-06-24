@@ -22,7 +22,7 @@
 
 @implementation SecureKeyStore
 
-- (void) writeToSecureKeyStorage:(NSMutableDictionary*) dict 
+- (void) writeToSecureKeyStore:(NSMutableDictionary*) dict
 {
   // get keychain
   KeychainItemWrapper * keychain = [[KeychainItemWrapper alloc] initWithIdentifier:@"cordova.plugins.SecureKeyStore" accessGroup:nil];
@@ -36,7 +36,7 @@
   }
 }
 
-- (NSMutableDictionary *) readFromSecureKeyStorage 
+- (NSMutableDictionary *) readFromSecureKeyStore
 {
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
   // get keychain
@@ -64,9 +64,18 @@
 - (void) removeKeyFromSecureKeyStore:(NSString*) key
 {
     // get mutable dictionary and remove key from store
-    NSMutableDictionary *dict = [self readFromSecureKeyStorage];
+    NSMutableDictionary *dict = [self readFromSecureKeyStore];
     [dict removeObjectForKey:key];
-    [self writeToSecureKeyStorage:dict];     
+    [self writeToSecureKeyStore:dict];
+}
+
+- (void)handleAppUninstallation
+{
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"RnSksIsAppInstalled"]) {
+        [self resetSecureKeyStore];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"RnSksIsAppInstalled"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
 }
 
 - (void) set:(CDVInvokedUrlCommand*)command 
@@ -76,21 +85,18 @@
   NSString* value = [command.arguments objectAtIndex:1]; 
 
   @try {
-    // set flag
-    NSString *keyFlag = value;
-    [[NSUserDefaults standardUserDefaults] setObject:keyFlag forKey:key];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    // handle app uninstallation
+    [self handleAppUninstallation];
 
     // get mutable dictionary and store data
     [self.commandDelegate runInBackground:^{
 		@synchronized(self) {
-            NSMutableDictionary *dict = [self readFromSecureKeyStorage];
+            NSMutableDictionary *dict = [self readFromSecureKeyStore];
             [dict setValue: value forKey: key];
-            [self writeToSecureKeyStorage:dict];     
+            [self writeToSecureKeyStore:dict];
 
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Key saved to keychain successfully"];
-            [self.commandDelegate 
-            sendPluginResult:pluginResult callbackId:command.callbackId];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }
     }];
   }
@@ -107,11 +113,12 @@
   NSString* key = [command.arguments objectAtIndex:0];
 
   @try {
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:key]) {
-      [self.commandDelegate runInBackground:^{
-		    @synchronized(self) {      
+    // handle app uninstallation
+    [self handleAppUninstallation];
+    [self.commandDelegate runInBackground:^{
+        @synchronized(self) {
             // get mutable dictionaly and retrieve store data
-            NSMutableDictionary *dict = [self readFromSecureKeyStorage];
+            NSMutableDictionary *dict = [self readFromSecureKeyStore];
             NSString *value = nil;
 
             if (dict != nil) {
@@ -121,12 +128,7 @@
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }
-      }];
-    } else {
-      [self removeKeyFromSecureKeyStore:key];
-      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: @"Exception: key not present in keychain"];
-      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];      
-    }
+    }];
   }
   @catch (NSException* exception)
   {
@@ -140,10 +142,8 @@
   CDVPluginResult* pluginResult = nil;
   NSString* key = (NSString*)[command.arguments objectAtIndex:0];
   @try {
-      // remove key flag
-      [[NSUserDefaults standardUserDefaults] removeObjectForKey:key]; 
-      [[NSUserDefaults standardUserDefaults] synchronize];
-
+      // handle app uninstallation
+      [self handleAppUninstallation];
       [self.commandDelegate runInBackground:^{
           @synchronized(self) {      
               [self removeKeyFromSecureKeyStore:key];
@@ -156,6 +156,11 @@
       pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: @"Exception: Could not delete key from keychain"];
       [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
   }
+}
+
+- (void) resetSecureKeyStore
+{
+    [[[KeychainItemWrapper alloc] initWithIdentifier:@"cordova.plugins.SecureKeyStore" accessGroup:nil] resetKeychainItem];
 }
 
 @end
