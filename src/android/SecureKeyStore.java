@@ -52,7 +52,7 @@ public class SecureKeyStore extends CordovaPlugin {
             String alias = args.getString(0);
             this.removeKeyFile(alias, callbackContext);
             return true;
-        }        
+        }
 
         return false;
     }
@@ -68,14 +68,9 @@ public class SecureKeyStore extends CordovaPlugin {
                 Calendar start = Calendar.getInstance();
                 Calendar end = Calendar.getInstance();
                 end.add(Calendar.YEAR, 1);
-                KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(
-                        getContext())
-                        .setAlias(alias)
-                        .setSubject(new X500Principal("CN=" + alias))
-                        .setSerialNumber(BigInteger.ONE)
-                        .setStartDate(start.getTime())
-                        .setEndDate(end.getTime())
-                        .build();
+                KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(getContext()).setAlias(alias)
+                        .setSubject(new X500Principal("CN=" + alias)).setSerialNumber(BigInteger.ONE)
+                        .setStartDate(start.getTime()).setEndDate(end.getTime()).build();
 
                 KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", getKeyStore());
                 generator.initialize(spec);
@@ -95,8 +90,7 @@ public class SecureKeyStore extends CordovaPlugin {
             Cipher cipher = Cipher.getInstance(Constants.RSA_ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            CipherOutputStream cipherOutputStream = new CipherOutputStream(
-                    outputStream, cipher);
+            CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, cipher);
             cipherOutputStream.write(input.getBytes("UTF-8"));
             cipherOutputStream.close();
             byte[] vals = outputStream.toByteArray();
@@ -107,8 +101,8 @@ public class SecureKeyStore extends CordovaPlugin {
             callbackContext.success("key created and stored successfully");
 
         } catch (Exception e) {
-            Log.e(Constants.TAG, "Exception: "  + e.getMessage());
-            callbackContext.error("Api-level:" + Build.VERSION.SDK_INT + "\nException: "  + e.getMessage());
+            Log.e(Constants.TAG, "Exception: " + e.getMessage());
+            callbackContext.error("{\"code\":9,\"api-level\":" + Build.VERSION.SDK_INT + ",\"class\":" + e.getMessage() + "}");
         }
 
     }
@@ -121,7 +115,6 @@ public class SecureKeyStore extends CordovaPlugin {
             keyStore.load(null);
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
 
-
             Cipher output = Cipher.getInstance(Constants.RSA_ALGORITHM);
             output.init(Cipher.DECRYPT_MODE, privateKey);
             CipherInputStream cipherInputStream = new CipherInputStream(
@@ -130,10 +123,10 @@ public class SecureKeyStore extends CordovaPlugin {
             ArrayList<Byte> values = new ArrayList<Byte>();
             int nextByte;
             while ((nextByte = cipherInputStream.read()) != -1) {
-                values.add((byte)nextByte);
+                values.add((byte) nextByte);
             }
             byte[] bytes = new byte[values.size()];
-            for(int i = 0; i < bytes.length; i++) {
+            for (int i = 0; i < bytes.length; i++) {
                 bytes[i] = values.get(i).byteValue();
             }
 
@@ -141,8 +134,8 @@ public class SecureKeyStore extends CordovaPlugin {
             callbackContext.success(finalText);
 
         } catch (Exception e) {
-            Log.e(Constants.TAG, "Exception: "  + e.getMessage());
-            callbackContext.error("Api-level:" + Build.VERSION.SDK_INT + "\nException: "  + e.getMessage());
+            Log.e(Constants.TAG, "Exception: " + e.getMessage());
+            callbackContext.error("{\"code\":1,\"api-level\":" + Build.VERSION.SDK_INT + ",\"class\":" + e.getMessage() + "}");
         }
     }
 
@@ -153,10 +146,10 @@ public class SecureKeyStore extends CordovaPlugin {
             callbackContext.success("keys removed successfully");
 
         } catch (Exception e) {
-            Log.e(Constants.TAG, "Exception: "  + e.getMessage());
-            callbackContext.error("Api-level:" + Build.VERSION.SDK_INT + "\nException: "  + e.getMessage());
+            Log.e(Constants.TAG, "Exception: " + e.getMessage());
+            callbackContext.error("{\"code\":6,\"api-level\":" + Build.VERSION.SDK_INT + ",\"class\":" + e.getMessage() + "}");
         }
-    }    
+    }
 
     private Context getContext() {
         return cordova.getActivity().getApplicationContext();
@@ -166,13 +159,11 @@ public class SecureKeyStore extends CordovaPlugin {
         try {
             KeyStore.getInstance(Constants.KEYSTORE_PROVIDER_1);
             return Constants.KEYSTORE_PROVIDER_1;
-        }
-        catch (Exception err) {
+        } catch (Exception err) {
             try {
                 KeyStore.getInstance(Constants.KEYSTORE_PROVIDER_2);
                 return Constants.KEYSTORE_PROVIDER_2;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 return Constants.KEYSTORE_PROVIDER_3;
             }
         }
