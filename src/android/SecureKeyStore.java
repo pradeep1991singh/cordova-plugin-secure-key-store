@@ -102,7 +102,8 @@ public class SecureKeyStore extends CordovaPlugin {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "Exception: " + e.getMessage());
-            callbackContext.error("{\"code\":9,\"api-level\":" + Build.VERSION.SDK_INT + ",\"class\":" + e.getMessage() + "}");
+            callbackContext.error(
+                    "{\"code\":9,\"api-level\":" + Build.VERSION.SDK_INT + ",\"message\":" + e.getMessage() + "}");
         }
 
     }
@@ -135,7 +136,8 @@ public class SecureKeyStore extends CordovaPlugin {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "Exception: " + e.getMessage());
-            callbackContext.error("{\"code\":1,\"api-level\":" + Build.VERSION.SDK_INT + ",\"class\":" + e.getMessage() + "}");
+            callbackContext.error(
+                    "{\"code\":1,\"api-level\":" + Build.VERSION.SDK_INT + ",\"message\":" + e.getMessage() + "}");
         }
     }
 
@@ -147,7 +149,8 @@ public class SecureKeyStore extends CordovaPlugin {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "Exception: " + e.getMessage());
-            callbackContext.error("{\"code\":6,\"api-level\":" + Build.VERSION.SDK_INT + ",\"class\":" + e.getMessage() + "}");
+            callbackContext.error(
+                    "{\"code\":6,\"api-level\":" + Build.VERSION.SDK_INT + ",\"message\":" + e.getMessage() + "}");
         }
     }
 
