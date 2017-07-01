@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-secure-key-store",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "Cordova plugin for securely saving keys, passwords or strings on devices.",
   "cordova": {
     "id": "cordova-plugin-secure-key-store",
