@@ -57,7 +57,7 @@
     {
         NSLog(@"Read exception: %@", exception);
     }
-    return dict;
+    return [dict mutableCopy];
 }
 
 - (BOOL) removeKeyFromSecureKeyStore:(NSString*) key
